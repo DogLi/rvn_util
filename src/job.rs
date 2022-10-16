@@ -20,7 +20,7 @@ impl JobInfo {
     pub fn to_resp_str(&self) -> String {
         let id = job_id();
         format!(
-            "{{\"params\": [\"{}\", \"{}\", \"{}\", \"{}\", {}, \"{}\", \"{}\"], \"id\": null, \"method\": \"mining.notify\"}}",
+            "{{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"{}\",\"{}\",\"{}\",\"{}\",{},\"{}\",\"{}\"]}}",
             id,
             hex::encode(self.header_hash),
             self.seed_hash,
