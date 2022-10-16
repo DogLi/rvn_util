@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 
 pub fn merkel_hash(txids: Vec<[u8; 32]>) -> [u8; 32] {
     if txids.is_empty() {
-        return dsha256(b"")
+        return dsha256(b"");
     }
     if txids.len() == 1 {
         return txids[0];

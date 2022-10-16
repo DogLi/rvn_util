@@ -55,23 +55,23 @@ pub struct BlockTemplateInfo {
     pub default_witness_commitment: String,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Default)]
+#[derive(Debug, Clone, Eq, PartialEq, Default, Serialize, Deserialize)]
 pub struct BlockTemplate {
-    pool_addr: Address,
-    pool_info: String,
-    coinbase_tx: Vec<u8>,
-    coinbase_txid: [u8; 32],
-    seed_hash: [u8; 32],
-    header: Vec<u8>,
-    header_hash: [u8; 32],
-    prev_hash: Vec<u8>,
-    timestamp: u32,
-    external_txs: Vec<String>,
-    target_hex: String,
-    bits_hex: String,
-    witness_hex: String,
-    version: u32,
-    height: u32,
+    pub pool_addr: Address,
+    pub pool_info: String,
+    pub coinbase_tx: Vec<u8>,
+    pub coinbase_txid: [u8; 32],
+    pub seed_hash: [u8; 32],
+    pub header: Vec<u8>,
+    pub header_hash: [u8; 32],
+    pub prev_hash: Vec<u8>,
+    pub timestamp: u32,
+    pub external_txs: Vec<String>,
+    pub target_hex: String,
+    pub bits_hex: String,
+    pub witness_hex: String,
+    pub version: u32,
+    pub height: u32,
 }
 
 const KAWPOW_EPOCH_LENGTH: usize = 7500;
@@ -181,10 +181,8 @@ impl BlockTemplate {
     }
 
     /// target_hex: like "00000001ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-    pub fn create_job(&self, id: u32, target_hex: String, refresh: bool) -> JobInfo {
-        let id = hex::encode(id.to_string());
+    pub fn create_job(&self, target_hex: String, refresh: bool) -> JobInfo {
         JobInfo {
-            id,
             header_hash: self.header_hash,
             seed_hash: hex::encode(self.seed_hash),
             share_target_hex: target_hex,

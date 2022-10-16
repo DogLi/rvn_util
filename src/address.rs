@@ -1,7 +1,8 @@
 use anyhow::{bail, Error};
+use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-#[derive(Debug, Clone, Default, Eq, PartialEq)]
+#[derive(Debug, Clone, Default, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Address {
     inner: String,
     testnet: bool,

@@ -3,7 +3,6 @@ use crate::op_data::OpData;
 /// 矿机任务所需的信息
 #[derive(Debug, Clone)]
 pub struct JobInfo {
-    pub id: String,
     pub header_hash: [u8; 32],
     pub seed_hash: String,
     pub share_target_hex: String,
@@ -17,10 +16,10 @@ pub struct JobInfo {
 }
 
 impl JobInfo {
-    pub fn to_resp_str(&self) -> String {
+    pub fn to_resp_str(&self, id: &str) -> String {
         format!(
             "{{\"params\": [\"{}\", \"{}\", \"{}\", \"{}\", {}, \"{}\", \"{}\"], \"id\": null, \"method\": \"mining.notify\"}}",
-            self.id,
+            id,
             hex::encode(self.header_hash),
             self.seed_hash,
             self.share_target_hex,
