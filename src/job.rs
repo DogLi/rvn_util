@@ -1,4 +1,5 @@
 use crate::op_data::OpData;
+use rand::Rng;
 
 /// 矿机任务所需的信息
 #[derive(Debug, Clone)]
@@ -16,7 +17,8 @@ pub struct JobInfo {
 }
 
 impl JobInfo {
-    pub fn to_resp_str(&self, id: &str) -> String {
+    pub fn to_resp_str(&self) -> String {
+        let id = job_id();
         format!(
             "{{\"params\": [\"{}\", \"{}\", \"{}\", \"{}\", {}, \"{}\", \"{}\"], \"id\": null, \"method\": \"mining.notify\"}}",
             id,
@@ -40,5 +42,33 @@ impl JobInfo {
             hex::encode(&self.coinbase_tx),
             self.external_txs.join(",")
         )
+    }
+}
+
+
+pub fn job_id() -> String {
+    const CHARSET: &[u8] = b"abcdef0123456789";
+    const  ID_LEN: usize = 12;
+    let mut rng = rand::thread_rng();
+
+    let id: String = (0..ID_LEN)
+        .map(|_| {
+            let idx = rng.gen_range(0..CHARSET.len());
+            CHARSET[idx] as char
+        })
+        .collect();
+    id
+}
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_job_id() {
+        let a = job_id();
+        println!("id 1: {}", a);
+        println!("{:?}", hex::decode(&a).unwrap());
     }
 }
