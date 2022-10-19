@@ -5,6 +5,7 @@ use rand::Rng;
 #[derive(Debug, Clone)]
 pub struct JobInfo {
     pub header_hash: [u8; 32],
+    pub nonce: String,
     pub seed_hash: String,
     pub share_target_hex: String,
     pub block_target_hex: String,
@@ -14,14 +15,14 @@ pub struct JobInfo {
     pub header: Vec<u8>,
     pub external_txs: Vec<String>,
     pub coinbase_tx: Vec<u8>,
+    pub timestamp: u32,
 }
 
 impl JobInfo {
     pub fn to_resp_str(&self) -> String {
-        let id = job_id();
         format!(
             "{{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"{}\",\"{}\",\"{}\",\"{}\",{},{},\"{}\"]}}",
-            id,
+            self.nonce,
             hex::encode(self.header_hash),
             self.seed_hash,
             self.share_target_hex,
@@ -31,12 +32,12 @@ impl JobInfo {
         )
     }
 
-    pub fn build_block(&self, nonce: &str, mix_hash: &str) -> String {
+    pub fn build_block(&self, mix_hash: &str) -> String {
         let op_data = OpData::default().var_push_num(self.external_txs.len() as u64 + 1);
         format!(
             "{}{}{}{}{}{}",
             hex::encode(&self.header),
-            nonce,
+            self.nonce,
             mix_hash,
             hex::encode(op_data.as_slice()),
             hex::encode(&self.coinbase_tx),
@@ -46,7 +47,7 @@ impl JobInfo {
 }
 
 
-pub fn job_id() -> String {
+pub(crate) fn nonce() -> String {
     const CHARSET: &[u8] = b"abcdef0123456789";
     const  ID_LEN: usize = 12;
     let mut rng = rand::thread_rng();
