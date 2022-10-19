@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::address::Address;
-use crate::job::{JobInfo, nonce};
+use crate::job::JobInfo;
 use crate::merkle::merkel_hash;
 use crate::op_data::OpData;
 use crate::script::Script;
@@ -184,7 +184,6 @@ impl BlockTemplate {
     pub fn create_job(&self, target_hex: String, refresh: bool) -> JobInfo {
         JobInfo {
             header_hash: self.header_hash,
-            nonce: nonce(),
             seed_hash: hex::encode(self.seed_hash),
             share_target_hex: target_hex,
             block_target_hex: self.target_hex.clone(),
