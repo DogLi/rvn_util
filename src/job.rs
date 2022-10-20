@@ -1,4 +1,5 @@
 use crate::op_data::OpData;
+use byteorder::{BigEndian, ByteOrder};
 
 /// 矿机任务所需的信息
 #[derive(Debug, Clone)]
@@ -18,7 +19,6 @@ pub struct JobInfo {
 
 impl JobInfo {
     pub fn to_resp_str(&self, job_id: &str) -> String {
-        let job_id = hex::encode(job_id);
         format!(
             "{{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"{}\",\"{}\",\"{}\",\"{}\",{},{},\"{}\"]}}",
             job_id,
