@@ -18,9 +18,9 @@ pub struct JobInfo {
 }
 
 pub fn nonce(miner_index: u64, job_id: u32) -> String {
-    let mut nonce = [0; 12];
-    BigEndian::write_u32(&mut nonce[0..4], job_id);
-    BigEndian::write_u64(&mut nonce[4..], miner_index);
+    let mut nonce = [0; 6];
+    BigEndian::write_u16(&mut nonce[0..2], job_id as u16);
+    BigEndian::write_u32(&mut nonce[2..6], miner_index as u32 );
     hex::encode(nonce)
 }
 
@@ -63,9 +63,13 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_job_id() {
-        let a = job_id();
-        println!("id 1: {}", a);
-        println!("{:?}", hex::decode(&a).unwrap());
+    fn test_nonce() {
+        let a = u64::MAX;
+        let b = 100;
+        let nonce = nonce(a, b);
+        println!("{:?}", nonce);
+        assert_eq!(nonce.len(), 12);
+        let n = "40c69e717b7e";
+        println!("{:?}", hex::decode(n).unwrap());
     }
 }

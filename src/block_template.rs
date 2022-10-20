@@ -257,7 +257,7 @@ mod test {
         let template_info: BlockTemplateInfo = serde_json::from_str(s).unwrap();
         let pool_addr = Address::from_str("RNs3ne88DoNEnXFTqUrj6zrYejeQpcj4jk").unwrap();
         let template = BlockTemplate::new(
-            template_info,
+            &template_info,
             pool_addr,
             "with a little help from http://github.com/kralverde/ravencoin-stratum-proxy"
                 .to_string(),
