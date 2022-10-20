@@ -85,15 +85,15 @@ fn now() -> u32 {
 
 impl BlockTemplate {
     pub fn new(
-        tempalte_info: BlockTemplateInfo,
+        template_info: &BlockTemplateInfo,
         pool_addr: Address,
         pool_info: String,
     ) -> Result<Self> {
-        let seed_hash = Self::seed_hash(tempalte_info.height);
-        let script = Script::coinbase_script(tempalte_info.height, &pool_info)?;
+        let seed_hash = Self::seed_hash(template_info.height);
+        let script = Script::coinbase_script(template_info.height, &pool_info)?;
         let coinbase_txin = Self::coinbase_txin(&script);
         let vout_to_miner = pool_addr.vout_to_miner();
-        let witness_vout = hex::decode(&tempalte_info.default_witness_commitment)?;
+        let witness_vout = hex::decode(&template_info.default_witness_commitment)?;
 
         // generate coinbase tx
         let coinbase_tx = OpData::default()
@@ -101,7 +101,7 @@ impl BlockTemplate {
             .push_slice(&[0x00, 0x01, 0x01])
             .push_slice(&coinbase_txin)
             .push_u8(0x02)
-            .push_u64(tempalte_info.coinbasevalue)
+            .push_u64(template_info.coinbasevalue)
             .op_push_slice(&vout_to_miner)
             .push_slice(&[0; 8])
             .op_push_slice(&witness_vout)
@@ -115,7 +115,7 @@ impl BlockTemplate {
             .push_u8(0x01)
             .push_slice(&coinbase_txin)
             .push_u8(0x02)
-            .push_u64(tempalte_info.coinbasevalue)
+            .push_u64(template_info.coinbasevalue)
             .op_push_slice(&vout_to_miner)
             .push_slice(&[0; 8])
             .op_push_slice(&witness_vout)
@@ -123,7 +123,7 @@ impl BlockTemplate {
 
         let coinbase_txid = dsha256(coinbase_no_wit.as_slice());
         let mut txids = vec![coinbase_txid];
-        let txids2: Vec<_> = tempalte_info
+        let txids2: Vec<_> = template_info
             .transactions
             .iter()
             .map(|s| {
@@ -133,7 +133,7 @@ impl BlockTemplate {
             })
             .collect();
         txids.extend_from_slice(&txids2);
-        let incoming_txs: Vec<_> = tempalte_info
+        let incoming_txs: Vec<_> = template_info
             .transactions
             .iter()
             .map(|s| s.data.clone())
@@ -145,17 +145,17 @@ impl BlockTemplate {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs() as u32;
-        let mut prev_hash = hex::decode(&tempalte_info.previousblockhash).unwrap();
+        let mut prev_hash = hex::decode(&template_info.previousblockhash).unwrap();
         prev_hash.reverse();
-        let mut bits_hex = hex::decode(&tempalte_info.bits).unwrap();
+        let mut bits_hex = hex::decode(&template_info.bits).unwrap();
         bits_hex.reverse();
         let op_data_header = OpData::default()
-            .push_u32(tempalte_info.version)
+            .push_u32(template_info.version)
             .push_slice(&prev_hash)
             .push_slice(&merkle)
             .push_u32(ts)
             .push_slice(&bits_hex)
-            .push_u32(tempalte_info.height);
+            .push_u32(template_info.height);
         let header = op_data_header.as_slice().to_vec();
         let mut header_hash = dsha256(&header);
         header_hash.reverse();
@@ -164,7 +164,7 @@ impl BlockTemplate {
             pool_addr,
             pool_info,
             coinbase_tx: coinbase_tx.as_slice().to_vec(),
-            witness_hex: tempalte_info.default_witness_commitment.clone(),
+            witness_hex: template_info.default_witness_commitment.clone(),
             coinbase_txid,
             seed_hash,
             header,
@@ -172,10 +172,10 @@ impl BlockTemplate {
             prev_hash,
             timestamp: ts,
             external_txs: incoming_txs,
-            target_hex: tempalte_info.target,
-            bits_hex: tempalte_info.bits,
-            version: tempalte_info.version,
-            height: tempalte_info.height,
+            target_hex: template_info.target.clone(),
+            bits_hex: template_info.bits.clone(),
+            version: template_info.version,
+            height: template_info.height,
         };
         Ok(obj)
     }
