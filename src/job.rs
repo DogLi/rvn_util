@@ -1,5 +1,4 @@
 use crate::op_data::OpData;
-use byteorder::{BigEndian, ByteOrder};
 
 /// 矿机任务所需的信息
 #[derive(Debug, Clone)]
@@ -17,24 +16,12 @@ pub struct JobInfo {
     pub timestamp: u32,
 }
 
-pub fn nonce(miner_index: u64, job_id: u32) -> String {
-    let mut nonce = [0; 6];
-    BigEndian::write_u16(&mut nonce[0..2], job_id as u16);
-    BigEndian::write_u32(&mut nonce[2..6], miner_index as u32 );
-    hex::encode(nonce)
-}
-
-pub fn job_id_from_nonce(nonce: &str) -> u32 {
-    let nonce = hex::decode(nonce).unwrap();
-    BigEndian::read_u32(&nonce[0..4])
-}
-
 impl JobInfo {
-    pub fn to_resp_str(&self, job_id: u32, miner_id: u64) -> String {
-        let nonce_hex = nonce(miner_id, job_id);
+    pub fn to_resp_str(&self, job_id: &str) -> String {
+        let job_id = hex::encode(job_id);
         format!(
             "{{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"{}\",\"{}\",\"{}\",\"{}\",{},{},\"{}\"]}}",
-            nonce_hex,
+            job_id,
             hex::encode(self.header_hash),
             self.seed_hash,
             self.share_target_hex,
@@ -55,21 +42,5 @@ impl JobInfo {
             hex::encode(&self.coinbase_tx),
             self.external_txs.join(",")
         )
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_nonce() {
-        let a = u64::MAX;
-        let b = 100;
-        let nonce = nonce(a, b);
-        println!("{:?}", nonce);
-        assert_eq!(nonce.len(), 12);
-        let n = "40c69e717b7e";
-        println!("{:?}", hex::decode(n).unwrap());
     }
 }
