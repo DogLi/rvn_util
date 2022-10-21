@@ -1,5 +1,4 @@
 use crate::op_data::OpData;
-use byteorder::{BigEndian, ByteOrder};
 
 /// 矿机任务所需的信息
 #[derive(Debug, Clone)]
