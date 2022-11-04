@@ -14,7 +14,7 @@ impl FromStr for Address {
         let checker = bs58::decode(&s).with_check(None).into_vec()?;
         let testnet = if checker[0] == 111 {
             Ok::<bool, Self::Err>(true)
-        } else if checker[0] == 60 {
+        } else if checker[0] == 60 || checker[0] == 38 {
             Ok(false)
         } else {
             bail!("Invalid Address")
@@ -52,6 +52,8 @@ mod test {
             118_u8, 169, 20, 149, 0, 219, 97, 53, 71, 189, 57, 112, 252, 206, 194, 167, 169, 9,
             185, 46, 117, 0, 89, 136, 172,
         ];
-        assert_eq!(out, out_exp)
+        assert_eq!(out, out_exp);
+        let address = Address::from_str("GguoEAdcqM51uQcDevZv1CskVnSPY3awKx");
+        println!("{:?}", address);
     }
 }
