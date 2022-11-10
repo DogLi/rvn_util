@@ -1,4 +1,4 @@
-use anyhow::{bail, Error};
+use anyhow::Error;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
@@ -12,13 +12,7 @@ impl FromStr for Address {
     type Err = Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let checker = bs58::decode(&s).with_check(None).into_vec()?;
-        let testnet = if checker[0] == 111 {
-            Ok::<bool, Self::Err>(true)
-        } else if checker[0] == 60 || checker[0] == 38 {
-            Ok(false)
-        } else {
-            bail!("Invalid Address")
-        }?;
+        let testnet = checker[0] != 60;
         Ok(Self {
             inner: s.into(),
             testnet,
@@ -53,7 +47,7 @@ mod test {
             185, 46, 117, 0, 89, 136, 172,
         ];
         assert_eq!(out, out_exp);
-        let address = Address::from_str("GguoEAdcqM51uQcDevZv1CskVnSPY3awKx");
+        let address = Address::from_str("MF8zHXrZcnARfzpfXW3yBB6xC5QKeyWgkr");
         println!("{:?}", address);
     }
 }
